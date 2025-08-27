@@ -1,8 +1,10 @@
+console.log("Starting Exercise Tracker server...");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const app = express();
 const { v4: uuidv4 } = require("uuid");
+
+const app = express();
 
 // Middleware
 app.use(cors());
@@ -10,74 +12,63 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // In-memory storage
-let users = [];
+const users = [];
 
-// Routes
-
-// 1. Create new user
-app.post("/api/users", (req, res) => {
-  const { username } = req.body;
-  if (!username) return res.json({ error: "Username is required" });
-
-  const user = { username, _id: uuidv4() };
-  users.push(user);
-  res.json(user);
+// Root route
+app.get("/", (req, res) => {
+  res.send("Exercise Tracker API is running 🚀");
 });
 
-// 2. Get all users
+// Create new user
+app.post("/api/users", (req, res) => {
+  const username = req.body.username;
+  if (!username) return res.status(400).json({ error: "Username required" });
+
+  const newUser = { username, _id: uuidv4() };
+  users.push(newUser);
+  res.json(newUser);
+});
+
+// Get all users
 app.get("/api/users", (req, res) => {
   res.json(users);
 });
 
-// 3. Add exercise
+// Add exercise to a user
 app.post("/api/users/:_id/exercises", (req, res) => {
-  const { description, duration, date } = req.body;
   const user = users.find((u) => u._id === req.params._id);
+  if (!user) return res.status(404).json({ error: "User not found" });
 
-  if (!user) return res.json({ error: "User not found" });
-
-  const exerciseDate = date ? new Date(date) : new Date();
+  const { description, duration, date } = req.body;
   const exercise = {
     description,
     duration: Number(duration),
-    date: exerciseDate.toDateString(),
+    date: date ? new Date(date).toDateString() : new Date().toDateString(),
   };
 
   if (!user.log) user.log = [];
   user.log.push(exercise);
 
-  res.json({
-    username: user.username,
-    _id: user._id,
-    description: exercise.description,
-    duration: exercise.duration,
-    date: exercise.date,
-  });
+  res.json({ ...user, ...exercise });
 });
 
-// 4. Get exercise log
+// Get exercise logs
 app.get("/api/users/:_id/logs", (req, res) => {
-  const { from, to, limit } = req.query;
   const user = users.find((u) => u._id === req.params._id);
-
-  if (!user) return res.json({ error: "User not found" });
+  if (!user) return res.status(404).json({ error: "User not found" });
 
   let log = user.log || [];
+  const { from, to, limit } = req.query;
 
   if (from) log = log.filter((e) => new Date(e.date) >= new Date(from));
   if (to) log = log.filter((e) => new Date(e.date) <= new Date(to));
   if (limit) log = log.slice(0, Number(limit));
 
-  res.json({
-    username: user.username,
-    _id: user._id,
-    count: log.length,
-    log,
-  });
+  res.json({ username: user.username, count: log.length, _id: user._id, log });
 });
 
-// Listen
+// Listen on Sandbox's port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Exercise Tracker API running on port ${PORT}`);
+  console.log(`Exercise Tracker API is running on port ${PORT}`);
 });
