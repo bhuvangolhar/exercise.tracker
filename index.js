@@ -51,6 +51,26 @@ app.post("/api/users/:_id/exercises", (req, res) => {
 
   res.json({ ...user, ...exercise });
 });
+// Get exercise logs
+app.get("/api/users/:_id/logs", (req, res) => {
+  const user = users.find((u) => u._id === req.params._id);
+  if (!user) return res.status(404).json({ error: "User not found" });
+
+  let log = user.log || [];
+  const { from, to, limit } = req.query;
+
+  if (from) log = log.filter((e) => new Date(e.date) >= new Date(from));
+  if (to) log = log.filter((e) => new Date(e.date) <= new Date(to));
+  if (limit) log = log.slice(0, Number(limit));
+
+  res.json({ username: user.username, count: log.length, _id: user._id, log });
+});
+
+// Listen on Sandbox's port
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Exercise Tracker API is running on port ${PORT}`);
+});
 
 // Get exercise logs
 app.get("/api/users/:_id/logs", (req, res) => {
