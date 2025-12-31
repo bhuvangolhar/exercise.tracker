@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 
-// Middleware
+// Middlewared
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
