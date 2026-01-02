@@ -1,5 +1,5 @@
-console.log("Starting Exercise Tracker server...");
-const express = require("express");
+ console.log("Starting Exercise Tracker server...");
+con st express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
