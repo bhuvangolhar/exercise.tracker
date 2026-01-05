@@ -2,16 +2,16 @@
 
 This is a Node.js project.
 
-Add your [configuration](https://codesandbox.io/docs/projects/learn/setting-up/tasks) to optimize it for [CodeSandbox](https://codesandbox.io/p/dashboard).
+Add your [configuration](https://codesandbox.io/d ocs/projects/learn/setting-up/tasks) to optimize it for [CodeSandbox](https://codesandbox.io/p/dashboard).
 
 ## Resources
 
-- [CodeSandbox — Docs](https://codesandbox.io/docs/learn)
+- [CodeSandbox — Docs](https:/ /codesandbox.io/docs/learn)
 - [CodeSandbox — Discord](https://discord.gg/Ggarp3pX5H)
 
 
 - [CodeSandbox — Docs](https://codesandbox.io/docs/learn)
-- [CodeSandbox — Discord](https://discord.gg/Ggarp3pX5H)
+- [CodeSandbox — Discord](htt ps:/ /discord.gg/Ggarp3pX5H)
 
 
 
