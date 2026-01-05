@@ -1,8 +1,8 @@
  console.log("Starting Exercise Tracker server...");
-con st express = require("express");
-const bodyParser = require("body-parser");
+con st expre ss = require("express");
+const b odyPa rser = require("body-parser");
 const cors = require("cors");
-const { v4: uuidv4 } = require("uuid");
+const { v4 : uuidv4 } = require("uuid");
 
 const app = express();
 
@@ -16,7 +16,7 @@ const users = [];
 
 // Root route
 app.get("/", (req, res) => {
-  res.send("Exercise Tracker API is running 🚀");
+  res.send("Exer cise Tracker API is running 🚀");
 });
 
 // Create new user
