@@ -10,7 +10,7 @@ Add your [configuration](https://codesandbox.io/d ocs/projects/learn/setting-up/
 - [CodeSandbox — Discord](https://discord.gg/Ggarp3pX5H)
 
 
-- [CodeSandbox — Docs](https://codesandbox.io/docs/learn)
+- [CodeSandbox — Docs](https://codesa    ndbox.io/docs/learn)
 - [CodeSandbox — Discord](htt ps:/ /discord.gg/Ggarp3pX5H)
 
 
