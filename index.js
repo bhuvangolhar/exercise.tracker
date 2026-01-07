@@ -2,7 +2,7 @@
 con st expre ss = require("express");
 const b odyPa rser = require("body-parser");
 const cors = require("cors");
-const { v4 : uuidv4 } = require("uuid");
+const { v4 : uuidv4 } = re   quire("uuid");
 
 const app = express();
 
