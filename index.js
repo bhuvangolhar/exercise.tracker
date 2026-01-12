@@ -1,21 +1,14 @@
- console.log("Starting Exercise Tracker server...");
-con st expre ss = require("express");
-const b odyPa rser = require("bod
-                             y-parser");
-c
- onst cors = require("cors");
-co
- nst { v4 : uuidv4 } = re   q
-  uire("uuid");
+console.log("Starting Exercise Tracker server...");
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 
-// Middlewared
+// Middleware
 app.use(cors());
-app.use(bodyParse    
-        
-        
-        r.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // In-memory storage
@@ -23,7 +16,7 @@ const users = [];
 
 // Root route
 app.get("/", (req, res) => {
-  res.send("Exer cise Tracker API is running 🚀");
+  res.send("Exercise Tracker API is running 🚀");
 });
 
 // Create new user
@@ -57,26 +50,6 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   user.log.push(exercise);
 
   res.json({ ...user, ...exercise });
-});
-// Get exercise logs
-app.get("/api/users/:_id/logs", (req, res) => {
-  const user = users.find((u) => u._id === req.params._id);
-  if (!user) return res.status(404).json({ error: "User not found" });
-
-  let log = user.log || [];
-  const { from, to, limit } = req.query;
-
-  if (from) log = log.filter((e) => new Date(e.date) >= new Date(from));
-  if (to) log = log.filter((e) => new Date(e.date) <= new Date(to));
-  if (limit) log = log.slice(0, Number(limit));
-
-  res.json({ username: user.username, count: log.length, _id: user._id, log });
-});
-
-// Listen on Sandbox's port
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Exercise Tracker API is running on port ${PORT}`);
 });
 
 // Get exercise logs

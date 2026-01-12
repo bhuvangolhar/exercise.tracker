@@ -1,2 +1,2 @@
- _ __ _node_modules_ _ _
-....env!!!!!!!
+node_modules/
+.env
