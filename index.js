@@ -40,6 +40,10 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   if (!user) return res.status(404).json({ error: "User not found" });
 
   const { description, duration, date } = req.body;
+  if (!description || !duration) {
+    return res.status(400).json({ error: "Description and duration required" });
+  }
+
   const exercise = {
     description,
     duration: Number(duration),
@@ -49,7 +53,11 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   if (!user.log) user.log = [];
   user.log.push(exercise);
 
-  res.json({ ...user, ...exercise });
+  res.json({
+    username: user.username,
+    _id: user._id,
+    ...exercise
+  });
 });
 
 // Get exercise logs
@@ -60,8 +68,14 @@ app.get("/api/users/:_id/logs", (req, res) => {
   let log = user.log || [];
   const { from, to, limit } = req.query;
 
-  if (from) log = log.filter((e) => new Date(e.date) >= new Date(from));
-  if (to) log = log.filter((e) => new Date(e.date) <= new Date(to));
+  if (from) {
+    const fromDate = new Date(from);
+    log = log.filter((e) => new Date(e.date) >= fromDate);
+  }
+  if (to) {
+    const toDate = new Date(to);
+    log = log.filter((e) => new Date(e.date) <= toDate);
+  }
   if (limit) log = log.slice(0, Number(limit));
 
   res.json({ username: user.username, count: log.length, _id: user._id, log });

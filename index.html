@@ -2,17 +2,161 @@
 <html>
   <head>
     <title>Exercise Tracker</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+      .section { margin-bottom: 30px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; }
+      h2 { color: #333; }
+      input, button { padding: 8px; margin: 5px 0; margin-right: 10px; }
+      input { border: 1px solid #ddd; border-radius: 4px; }
+      button { background-color: #007bff; color: white; cursor: pointer; border: none; border-radius: 4px; }
+      button:hover { background-color: #0056b3; }
+      .message { margin-top: 10px; padding: 10px; border-radius: 4px; }
+      .success { background-color: #d4edda; color: #155724; }
+      .error { background-color: #f8d7da; color: #721c24; }
+      #logsResult { margin-top: 15px; }
+      #logsResult ul { list-style-type: none; padding: 0; }
+      #logsResult li { padding: 8px; margin: 5px 0; background-color: #f5f5f5; border-radius: 4px; }
+    </style>
   </head>
   <body>
-    <h1>Create a User</h1>
-    <form action="/api/users" method="POST">
-      <input
-        type="text"
-        name="username"
-        placeholder="Enter username"
-        required
-      />
-      <button type="submit">Create</button>
-    </form>
+    <h1>Exercise Tracker</h1>
+    
+    <div class="section">
+      <h2>Create a User</h2>
+      <form id="userForm">
+        <input type="text" id="username" placeholder="Enter username" required />
+        <button type="submit">Create User</button>
+      </form>
+      <p id="userMessage"></p>
+    </div>
+
+    <div class="section">
+      <h2>Add Exercise</h2>
+      <form id="exerciseForm">
+        <div>
+          <input type="text" id="userId" placeholder="User ID" required />
+        </div>
+        <div>
+          <input type="text" id="description" placeholder="Exercise description" required />
+        </div>
+        <div>
+          <input type="number" id="duration" placeholder="Duration (minutes)" required />
+        </div>
+        <div>
+          <input type="date" id="date" placeholder="Date (optional)" />
+          <button type="submit">Add Exercise</button>
+        </div>
+      </form>
+      <p id="exerciseMessage"></p>
+    </div>
+
+    <div class="section">
+      <h2>Get Exercise Logs</h2>
+      <form id="logsForm">
+        <div>
+          <input type="text" id="logsUserId" placeholder="User ID" required />
+        </div>
+        <div>
+          <input type="date" id="fromDate" placeholder="From date (optional)" />
+          <input type="date" id="toDate" placeholder="To date (optional)" />
+        </div>
+        <div>
+          <input type="number" id="limitLogs" placeholder="Limit (optional)" />
+          <button type="submit">Get Logs</button>
+        </div>
+      </form>
+      <div id="logsResult"></div>
+    </div>
+
+    <script>
+      // Create user
+      document.getElementById('userForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        try {
+          const response = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+          });
+          const data = await response.json();
+          if (response.ok) {
+            const msg = document.getElementById('userMessage');
+            msg.textContent = `✓ User created: ${data.username} (ID: ${data._id})`;
+            msg.className = 'message success';
+            document.getElementById('username').value = '';
+          } else {
+            throw new Error(data.error);
+          }
+        } catch (error) {
+          const msg = document.getElementById('userMessage');
+          msg.textContent = `✗ Error: ${error.message}`;
+          msg.className = 'message error';
+        }
+      });
+
+      // Add exercise
+      document.getElementById('exerciseForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userId = document.getElementById('userId').value;
+        const description = document.getElementById('description').value;
+        const duration = document.getElementById('duration').value;
+        const date = document.getElementById('date').value;
+        try {
+          const response = await fetch(`/api/users/${userId}/exercises`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ description, duration, date: date || undefined })
+          });
+          const data = await response.json();
+          if (response.ok) {
+            const msg = document.getElementById('exerciseMessage');
+            msg.textContent = `✓ Exercise added: ${data.description} (${data.duration} min on ${data.date})`;
+            msg.className = 'message success';
+            document.getElementById('exerciseForm').reset();
+          } else {
+            throw new Error(data.error);
+          }
+        } catch (error) {
+          const msg = document.getElementById('exerciseMessage');
+          msg.textContent = `✗ Error: ${error.message}`;
+          msg.className = 'message error';
+        }
+      });
+
+      // Get logs
+      document.getElementById('logsForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userId = document.getElementById('logsUserId').value;
+        const from = document.getElementById('fromDate').value;
+        const to = document.getElementById('toDate').value;
+        const limit = document.getElementById('limitLogs').value;
+        const params = new URLSearchParams();
+        if (from) params.append('from', from);
+        if (to) params.append('to', to);
+        if (limit) params.append('limit', limit);
+        try {
+          const response = await fetch(`/api/users/${userId}/logs?${params}`);
+          const data = await response.json();
+          if (response.ok) {
+            let html = `<h3>${data.username}'s Exercises (${data.count} total)</h3>`;
+            if (data.count === 0) {
+              html += '<p>No exercises found.</p>';
+            } else {
+              html += '<ul>';
+              data.log.forEach(ex => {
+                html += `<li><strong>${ex.description}</strong> - ${ex.duration} min (${ex.date})</li>`;
+              });
+              html += '</ul>';
+            }
+            document.getElementById('logsResult').innerHTML = html;
+          } else {
+            throw new Error(data.error);
+          }
+        } catch (error) {
+          document.getElementById('logsResult').textContent = `✗ Error: ${error.message}`;
+        }
+      });
+    </script>
   </body>
 </html>
